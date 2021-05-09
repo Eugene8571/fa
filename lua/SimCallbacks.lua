@@ -10,6 +10,34 @@
 
 local Callbacks = {}
 
+
+function table_to_string(tbl)
+    if type(tbl) == "string" then return "'"..tbl.."'" end
+        local result = "{"
+    for k, v in pairs(tbl) do
+        -- Check the key type (ignore any numerical keys - assume its an array)
+        if type(k) == "string" then
+            result = result.."[\""..k.."\"]".."="
+        end
+
+        -- Check the value type
+        if type(v) == "table" then
+            result = result..table_to_string(v)
+        elseif type(v) == "boolean" then
+            result = result..tostring(v)
+        else
+            result = result.."\""..tostring(v).."\""
+        end
+        result = result..","
+    end
+    -- Remove leading commas from the result
+    if result ~= "" then
+        result = result:sub(1, result:len()-1)
+    end
+    return result.."}"
+end
+
+
 function DoCallback(name, data, units)
     local fn = Callbacks[name];
     if fn then
@@ -259,6 +287,17 @@ function IsInvalidAssist(unit, target)
 end
 
 Callbacks.AttackMove = function(data, units)
+    LOG('AttackMove')
+    LOG(table_to_string(data))
+
+    local engis = EntityCategoryFilterDown(categories.ENGINEER, units)
+    if engis[1] then 
+        LOG('engis[1] ', engis[1])
+        -- if CanBuildInSpot(mex, msid, location) then
+        IssueBuildMobile({engis[1]}, data.Target, 'ueb1103', {})
+        -- end
+    end
+
     if data.Clear then
         IssueClearCommands(units)
     end
