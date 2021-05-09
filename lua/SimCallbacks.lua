@@ -295,6 +295,8 @@ Callbacks.AttackMove = function(data, units)
         LOG('engis[1] ', engis[1])
         -- if CanBuildInSpot(mex, msid, location) then
         IssueBuildMobile({engis[1]}, data.Target, 'ueb1103', {})
+        IssueGuard(units, engis[1])
+        return
         -- end
     end
 
